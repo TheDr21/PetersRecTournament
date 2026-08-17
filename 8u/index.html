@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Summer Showdown 8U — Tournament Breakdown</title>
+<style>
+:root{
+  --dirt:#8f1f24; --peters:#b3282d; --chalk:#faf7f2; --line:#e8ddd6;
+  --ink:#231f1e; --dug:#6b625c; --optic:#dfe34a; --turf:#2d5a3d;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Georgia,'Times New Roman',serif;background:var(--chalk);color:var(--ink);line-height:1.5}
+.scoreboard{background:var(--ink);color:var(--chalk);padding:28px 20px 22px;position:relative;overflow:hidden}
+.scoreboard::after{content:'';position:absolute;left:0;right:0;bottom:0;height:5px;
+  background:repeating-linear-gradient(90deg,var(--optic) 0 26px,transparent 26px 40px)}
+.sb-inner{max-width:860px;margin:0 auto}
+.eyebrow{font-family:'Courier New',monospace;font-size:11px;letter-spacing:.22em;color:var(--optic);text-transform:uppercase}
+h1{font-size:clamp(26px,5vw,40px);font-weight:700;letter-spacing:-.01em;margin:6px 0 2px}
+.sb-sub{font-family:'Courier New',monospace;font-size:12px;color:#b8b0aa}
+nav{max-width:860px;margin:0 auto;display:flex;gap:0;border-bottom:2px solid var(--line);
+  position:sticky;top:0;background:var(--chalk);z-index:5}
+nav button{flex:1;padding:13px 4px;border:none;background:none;cursor:pointer;
+  font-family:'Courier New',monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--dug);border-bottom:3px solid transparent;transition:color .15s}
+nav button:hover{color:var(--peters)}
+nav button.on{color:var(--peters);border-bottom-color:var(--peters);font-weight:700}
+nav button:focus-visible{outline:2px solid var(--peters);outline-offset:-2px}
+main{max-width:860px;margin:0 auto;padding:22px 16px 60px}
+.view{display:none}.view.on{display:block;animation:rise .28s ease}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.view.on{animation:none}}
+/* standings */
+.stand{width:100%;border-collapse:collapse}
+.stand th{font-family:'Courier New',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--dug);text-align:left;padding:6px 8px;border-bottom:2px solid var(--ink)}
+.stand td{padding:10px 8px;border-bottom:1px solid var(--line);font-size:15px}
+.stand tr{cursor:pointer;transition:background .12s}
+.stand tbody tr:hover{background:#f3ebe4}
+.seed{font-family:'Courier New',monospace;font-weight:700;color:var(--peters);width:30px}
+.zero{display:inline-block;font-family:'Courier New',monospace;font-size:10px;background:var(--turf);
+  color:var(--chalk);padding:1px 7px;border-radius:9px;margin-left:8px;letter-spacing:.06em}
+.num{font-family:'Courier New',monospace;text-align:right}
+/* leaders */
+.lb-controls{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.chip{font-family:'Courier New',monospace;font-size:11px;letter-spacing:.06em;padding:7px 13px;
+  border:1.5px solid var(--ink);background:none;border-radius:20px;cursor:pointer;color:var(--ink)}
+.chip.on{background:var(--peters);border-color:var(--peters);color:var(--chalk);font-weight:700}
+.chip:focus-visible{outline:2px solid var(--peters);outline-offset:2px}
+.lb{width:100%;border-collapse:collapse}
+.lb th{font-family:'Courier New',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--dug);text-align:right;padding:6px;border-bottom:2px solid var(--ink)}
+.lb th:first-child,.lb th:nth-child(2){text-align:left}
+.lb td{padding:9px 6px;border-bottom:1px solid var(--line);font-size:14px;text-align:right}
+.lb td:first-child{text-align:left;font-weight:700}
+.lb td:nth-child(2){text-align:left;color:var(--dug);font-size:12.5px;font-family:'Courier New',monospace}
+.lb .lead{font-family:'Courier New',monospace;font-weight:700;color:var(--peters)}
+.medal{color:var(--peters);font-weight:700}
+.lb-note{font-size:12px;color:var(--dug);margin-top:10px;font-style:italic}
+/* results */
+.dayhead{font-family:'Courier New',monospace;font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--peters);margin:20px 0 8px;font-weight:700}
+.gline{display:flex;align-items:baseline;gap:10px;padding:9px 6px;border-bottom:1px solid var(--line);font-size:15px}
+.gline .sc{font-family:'Courier New',monospace;font-weight:700;min-width:52px;text-align:center;color:var(--ink)}
+.gline .w{font-weight:700}
+.gline .meta{margin-left:auto;font-family:'Courier New',monospace;font-size:10.5px;color:var(--dug)}
+.storm{margin-top:22px;padding:14px 16px;background:#f4e8d8;border-left:4px solid var(--dirt);font-size:14px;font-style:italic}
+/* team detail */
+.teampick{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:18px}
+.tcard{padding:13px 14px;border:1.5px solid var(--line);border-radius:8px;background:#fff;cursor:pointer;text-align:left;
+  font-family:Georgia,serif;transition:border-color .12s,transform .12s}
+.tcard:hover{border-color:var(--peters);transform:translateY(-1px)}
+.tcard:focus-visible{outline:2px solid var(--peters)}
+.tcard .tn{font-weight:700;font-size:15px}
+.tcard .tr{font-family:'Courier New',monospace;font-size:11px;color:var(--dug);margin-top:2px}
+.tdetail{border:2px solid var(--ink);border-radius:10px;background:#fff;overflow:hidden}
+.tdetail header{background:var(--peters);color:var(--chalk);padding:14px 18px}
+.tdetail header h2{font-size:22px}
+.tdetail header .rec{font-family:'Courier New',monospace;font-size:12px;color:#f3cfd1}
+.tbody{padding:16px 18px}
+.hl{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+.hstat{flex:1;min-width:130px;border-left:3px solid var(--optic);padding-left:10px}
+.hstat .bignum{font-family:'Courier New',monospace;font-size:26px;font-weight:700;color:var(--peters);line-height:1}
+.hstat .lbl{font-size:12px;color:var(--dug);margin-top:3px}
+.glog{font-size:13.5px;font-family:'Courier New',monospace;color:var(--ink)}
+.glog div{padding:5px 0;border-bottom:1px dashed var(--line)}
+.back{font-family:'Courier New',monospace;font-size:11px;letter-spacing:.08em;background:none;border:none;
+  color:var(--peters);cursor:pointer;padding:0 0 12px;text-transform:uppercase;font-weight:700}
+footer{max-width:860px;margin:0 auto;padding:0 16px 40px;font-family:'Courier New',monospace;
+  font-size:10.5px;color:var(--dug)}
+</style>
+<style>
+.champbar{max-width:860px;margin:14px auto 0;padding:12px 16px;background:#c9a227;border-radius:10px;
+  font-family:'Courier New',monospace;text-align:center;color:#3a2f00;font-weight:700;letter-spacing:.04em}
+.champbar .big{font-family:Georgia,serif;font-size:20px;letter-spacing:0}
+</style>
+</head>
+<body>
+<div class="scoreboard"><div class="sb-inner">
+  <div class="eyebrow">Peters Township Rec &bull; Aug 13&ndash;16, 2026</div>
+  <h1>Summer Showdown &mdash; 8U Breakdown</h1>
+  <div class="sb-sub">8 teams &bull; 19 games &bull; 263 runs &bull; the only division to finish</div>
+</div></div>
+<div class="champbar">TOURNAMENT CHAMPIONS<br><span class="big">BULLSKIN 8U ALL STARS</span> &mdash; won the final 4-3 over USC</div>
+
+<nav role="tablist">
+  <button class="on" data-v="standings" role="tab" aria-selected="true">Standings</button>
+  <button data-v="results" role="tab" aria-selected="false">Results</button>
+  <button data-v="teams" role="tab" aria-selected="false">Teams</button>
+</nav>
+
+<main>
+<section class="view on" id="v-standings">
+  <table class="stand"><thead><tr><th></th><th>Team (tap for detail)</th><th class="num">W-L</th><th class="num">RS</th><th class="num">RA</th><th class="num">RD</th></tr></thead>
+  <tbody id="standbody"></tbody></table>
+  <p class="lb-note" style="margin-top:12px">Seeds from pool play. Coach-pitch division &mdash; player leaderboards arrive as team scorebooks come in.</p>
+</section>
+
+<section class="view" id="v-results">
+  <div id="resbody"></div>
+  <div class="storm" style="background:#f0ead2;border-left-color:#c9a227">While rain took the older divisions, 8U finished every game on Pleasant Valley's two fields &mdash; and settled it with three straight one-run games: 8-7, 10-9, and a 4-3 championship.</div>
+</section>
+
+<section class="view" id="v-teams">
+  <div id="teamwrap"></div>
+</section>
+</main>
+<footer>Data: Tourney Machine official results &bull; PTGSA</footer>
+
+<script>
+const TEAMS = {
+ tr:{name:"Trinity 8u Allstars",seed:1,rec:"4-1",pool:"3-0",rs:36,ra:19,rd:"+17",
+   hl:[["3-0","Only unbeaten pool run in the division"],["13-0","Opened with a shutout of Mt. Washington"],["8-7","Fell one run short in an all-timer semifinal"]],
+   log:["W 13-0 Mt. Washington","W 14-12 USC","W 9-7 Bullskin","W 13-1 CMGYSA (QF)","L 7-8 USC (semi)"]},
+ bk:{name:"Bullskin 8u All Stars",seed:2,rec:"5-1",pool:"2-1",rs:38,ra:16,rd:"+22",
+   hl:[["CHAMPS","Won the title 4-3 over USC"],["+22","Best run differential in the division"],["10-9","Survived Munhall in a classic semifinal"]],
+   log:["W 15-6 Mt. Washington","L 7-9 Trinity","W 16-1 CMGYSA","W 14-4 Mt. Washington (QF)","W 10-9 Munhall (semi)","W 4-3 USC — CHAMPIONSHIP"]},
+ mu:{name:"Munhall",seed:3,rec:"3-2",pool:"2-1",rs:35,ra:29,rd:"+6",
+   hl:[["22","Runs in one game vs CMGYSA"],["9-8","Edged Monroeville in a Saturday thriller"],["10-9","One run from the final"]],
+   log:["L 4-11 USC","W 9-8 Monroeville","W 22-10 CMGYSA","W 9-1 Monroeville (QF)","L 9-10 Bullskin (semi)"]},
+ pt:{name:"Peters Township 8u",seed:4,rec:"2-2",pool:"2-1",rs:40,ra:37,rd:"+3",
+   hl:[["40","Most runs scored in pool play"],["17-16","Won the wildest game of the weekend vs CMGYSA"],["14-10","Took the Thursday opener from USC"]],
+   log:["W 14-10 USC","W 17-16 CMGYSA","L 9-11 Monroeville","L 8-11 USC (QF)"]},
+ usc:{name:"USC 8U All Stars",seed:5,rec:"3-3",pool:"1-2",rs:33,ra:32,rd:"+1",
+   hl:[["8-7","Stunned #1 Trinity in the semifinal"],["11-4","Rolled Munhall for their pool win"],["4-3","One swing from the title as the 5 seed"]],
+   log:["L 10-14 Peters Twp","L 12-14 Trinity","W 11-4 Munhall","W 11-8 Peters Twp (QF)","W 8-7 Trinity (semi)","L 3-4 Bullskin — final"]},
+ mo:{name:"Monroeville Gators",seed:6,rec:"1-3",pool:"1-2",rs:33,ra:33,rd:"0",
+   hl:[["11-9","Beat the host Peters squad on Saturday"],["0","Dead-even run differential — every game a fight"],["14-15","Lost a 29-run shootout by a single run"]],
+   log:["L 8-9 Munhall","W 11-9 Peters Twp","L 14-15 Mt. Washington","L 1-9 Munhall (QF)"]},
+ mw:{name:"Mount Washington",seed:7,rec:"1-3",pool:"1-2",rs:21,ra:42,rd:"-21",
+   hl:[["15-14","Outlasted Monroeville in a slugfest"],["29","Combined runs in that one-run win"],["GRIT","Drew the 1 seed and the champs back-to-back"]],
+   log:["L 0-13 Trinity","L 6-15 Bullskin","W 15-14 Monroeville","L 4-14 Bullskin (QF)"]},
+ cm:{name:"CMGYSA-Powell",seed:8,rec:"0-4",pool:"0-3",rs:27,ra:55,rd:"-28",
+   hl:[["16","Runs in the Friday night classic vs Peters"],["17-16","Came one run from beating the hosts"],["27","Runs scored — the bats never quit"]],
+   log:["L 16-17 Peters Twp","L 10-22 Munhall","L 1-16 Bullskin","L 1-13 Trinity (QF)"]}
+};
+const GAMES = [
+ ["THURSDAY",[["Trinity",13,"Mt. Washington",0,"F3"],["Peters Twp",14,"USC",10,"F8"]]],
+ ["FRIDAY",[["Peters Twp",17,"CMGYSA",16,"Pleasant Valley"],["Trinity",14,"USC",12,"F1 \u00b7 lights"]]],
+ ["SATURDAY",[["USC",11,"Munhall",4,"F10"],["Munhall",9,"Monroeville",8,"F10"],
+  ["Monroeville",11,"Peters Twp",9,"F8"],["Bullskin",15,"Mt. Washington",6,"F1"],
+  ["Munhall",22,"CMGYSA",10,"F1"],["Trinity",9,"Bullskin",7,"F8"],
+  ["Mt. Washington",15,"Monroeville",14,"F1"],["Bullskin",16,"CMGYSA",1,"F8"]]],
+ ["SUNDAY \u00b7 BRACKET \u00b7 PLEASANT VALLEY",[
+  ["[5] USC",11,"[4] Peters Twp",8,"QF"],["[3] Munhall",9,"[6] Monroeville",1,"QF"],
+  ["[1] Trinity",13,"[8] CMGYSA",1,"QF"],["[2] Bullskin",14,"[7] Mt. Washington",4,"QF"],
+  ["USC",8,"Trinity",7,"SEMI \u2014 upset!"],["Bullskin",10,"Munhall",9,"SEMI"],
+  ["\ud83c\udfc6 BULLSKIN",4,"USC",3,"CHAMPIONSHIP"]]]
+];
+
+document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('nav button').forEach(x=>{x.classList.remove('on');x.setAttribute('aria-selected','false')});
+  b.classList.add('on');b.setAttribute('aria-selected','true');
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
+  document.getElementById('v-'+b.dataset.v).classList.add('on');
+}));
+const sb=document.getElementById('standbody');
+Object.entries(TEAMS).forEach(([k,t])=>{
+  const tr=document.createElement('tr');
+  tr.innerHTML=`<td class="seed">${t.seed}</td><td>${t.name}${k==='bk'?'<span class="zero" style="background:#c9a227;color:#3a2f00">CHAMPIONS</span>':''}</td>
+  <td class="num">${t.pool}</td><td class="num">${t.rs}</td><td class="num">${t.ra}</td><td class="num">${t.rd}</td>`;
+  tr.addEventListener('click',()=>showTeam(k,true));
+  sb.appendChild(tr);
+});
+document.getElementById('resbody').innerHTML=GAMES.map(([day,gs])=>
+  `<div class="dayhead">${day}</div>`+gs.map(g=>
+    `<div class="gline"><span class="w">${g[0]}</span><span class="sc">${g[1]}&ndash;${g[3]}</span><span>${g[2]}</span><span class="meta">${g[4]}</span></div>`).join('')).join('');
+function teamGrid(){
+  const w=document.getElementById('teamwrap');
+  w.innerHTML='<div class="teampick">'+Object.entries(TEAMS).map(([k,t])=>
+    `<button class="tcard" data-k="${k}"><div class="tn">${t.seed}. ${t.name}</div><div class="tr">${t.rec} overall</div></button>`).join('')+'</div>';
+  w.querySelectorAll('.tcard').forEach(c=>c.addEventListener('click',()=>showTeam(c.dataset.k,false)));
+}
+function showTeam(k,jump){
+  const t=TEAMS[k];
+  if(jump){document.querySelectorAll('nav button').forEach(x=>{x.classList.remove('on');x.setAttribute('aria-selected','false')});
+    const nb=document.querySelector('nav button[data-v="teams"]');nb.classList.add('on');nb.setAttribute('aria-selected','true');
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
+    document.getElementById('v-teams').classList.add('on');}
+  document.getElementById('teamwrap').innerHTML=
+    `<button class="back">&larr; All teams</button>
+     <div class="tdetail"><header${k==='bk'?' style="background:#c9a227"':''}><h2${k==='bk'?' style="color:#3a2f00"':''}>${t.name}</h2><div class="rec"${k==='bk'?' style="color:#6b5a10"':''}>Seed #${t.seed} &bull; ${t.rec} &bull; RS ${t.rs} / RA ${t.ra}</div></header>
+     <div class="tbody"><div class="hl">${t.hl.map(h=>`<div class="hstat"><div class="bignum">${h[0]}</div><div class="lbl">${h[1]}</div></div>`).join('')}</div>
+     <div class="glog">${t.log.map(g=>`<div>${g}</div>`).join('')}</div></div></div>`;
+  document.querySelector('.back').addEventListener('click',teamGrid);
+}
+teamGrid();
+</script>
+</body>
+</html>

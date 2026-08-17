@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Peters Township Rec — Summer Showdown 2026</title>
+<style>
+:root{
+  --dirt:#8f1f24; --peters:#b3282d; --chalk:#faf7f2; --line:#e8ddd6;
+  --ink:#231f1e; --dug:#6b625c; --optic:#dfe34a; --turf:#2d5a3d;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Georgia,'Times New Roman',serif;background:var(--chalk);color:var(--ink);line-height:1.5}
+.scoreboard{background:var(--ink);color:var(--chalk);padding:28px 20px 22px;position:relative;overflow:hidden}
+.scoreboard::after{content:'';position:absolute;left:0;right:0;bottom:0;height:5px;
+  background:repeating-linear-gradient(90deg,var(--optic) 0 26px,transparent 26px 40px)}
+.sb-inner{max-width:860px;margin:0 auto}
+.eyebrow{font-family:'Courier New',monospace;font-size:11px;letter-spacing:.22em;color:var(--optic);text-transform:uppercase}
+h1{font-size:clamp(26px,5vw,40px);font-weight:700;letter-spacing:-.01em;margin:6px 0 2px}
+.sb-sub{font-family:'Courier New',monospace;font-size:12px;color:#b8b0aa}
+nav{max-width:860px;margin:0 auto;display:flex;gap:0;border-bottom:2px solid var(--line);
+  position:sticky;top:0;background:var(--chalk);z-index:5}
+nav button{flex:1;padding:13px 4px;border:none;background:none;cursor:pointer;
+  font-family:'Courier New',monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--dug);border-bottom:3px solid transparent;transition:color .15s}
+nav button:hover{color:var(--peters)}
+nav button.on{color:var(--peters);border-bottom-color:var(--peters);font-weight:700}
+nav button:focus-visible{outline:2px solid var(--peters);outline-offset:-2px}
+main{max-width:860px;margin:0 auto;padding:22px 16px 60px}
+.view{display:none}.view.on{display:block;animation:rise .28s ease}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.view.on{animation:none}}
+/* standings */
+.stand{width:100%;border-collapse:collapse}
+.stand th{font-family:'Courier New',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--dug);text-align:left;padding:6px 8px;border-bottom:2px solid var(--ink)}
+.stand td{padding:10px 8px;border-bottom:1px solid var(--line);font-size:15px}
+.stand tr{cursor:pointer;transition:background .12s}
+.stand tbody tr:hover{background:#f3ebe4}
+.seed{font-family:'Courier New',monospace;font-weight:700;color:var(--peters);width:30px}
+.zero{display:inline-block;font-family:'Courier New',monospace;font-size:10px;background:var(--turf);
+  color:var(--chalk);padding:1px 7px;border-radius:9px;margin-left:8px;letter-spacing:.06em}
+.num{font-family:'Courier New',monospace;text-align:right}
+/* leaders */
+.lb-controls{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.chip{font-family:'Courier New',monospace;font-size:11px;letter-spacing:.06em;padding:7px 13px;
+  border:1.5px solid var(--ink);background:none;border-radius:20px;cursor:pointer;color:var(--ink)}
+.chip.on{background:var(--peters);border-color:var(--peters);color:var(--chalk);font-weight:700}
+.chip:focus-visible{outline:2px solid var(--peters);outline-offset:2px}
+.lb{width:100%;border-collapse:collapse}
+.lb th{font-family:'Courier New',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--dug);text-align:right;padding:6px;border-bottom:2px solid var(--ink)}
+.lb th:first-child,.lb th:nth-child(2){text-align:left}
+.lb td{padding:9px 6px;border-bottom:1px solid var(--line);font-size:14px;text-align:right}
+.lb td:first-child{text-align:left;font-weight:700}
+.lb td:nth-child(2){text-align:left;color:var(--dug);font-size:12.5px;font-family:'Courier New',monospace}
+.lb .lead{font-family:'Courier New',monospace;font-weight:700;color:var(--peters)}
+.medal{color:var(--peters);font-weight:700}
+.lb-note{font-size:12px;color:var(--dug);margin-top:10px;font-style:italic}
+/* results */
+.dayhead{font-family:'Courier New',monospace;font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--peters);margin:20px 0 8px;font-weight:700}
+.gline{display:flex;align-items:baseline;gap:10px;padding:9px 6px;border-bottom:1px solid var(--line);font-size:15px}
+.gline .sc{font-family:'Courier New',monospace;font-weight:700;min-width:52px;text-align:center;color:var(--ink)}
+.gline .w{font-weight:700}
+.gline .meta{margin-left:auto;font-family:'Courier New',monospace;font-size:10.5px;color:var(--dug)}
+.storm{margin-top:22px;padding:14px 16px;background:#f4e8d8;border-left:4px solid var(--dirt);font-size:14px;font-style:italic}
+/* team detail */
+.teampick{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:18px}
+.tcard{padding:13px 14px;border:1.5px solid var(--line);border-radius:8px;background:#fff;cursor:pointer;text-align:left;
+  font-family:Georgia,serif;transition:border-color .12s,transform .12s}
+.tcard:hover{border-color:var(--peters);transform:translateY(-1px)}
+.tcard:focus-visible{outline:2px solid var(--peters)}
+.tcard .tn{font-weight:700;font-size:15px}
+.tcard .tr{font-family:'Courier New',monospace;font-size:11px;color:var(--dug);margin-top:2px}
+.tdetail{border:2px solid var(--ink);border-radius:10px;background:#fff;overflow:hidden}
+.tdetail header{background:var(--peters);color:var(--chalk);padding:14px 18px}
+.tdetail header h2{font-size:22px}
+.tdetail header .rec{font-family:'Courier New',monospace;font-size:12px;color:#f3cfd1}
+.tbody{padding:16px 18px}
+.hl{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+.hstat{flex:1;min-width:130px;border-left:3px solid var(--optic);padding-left:10px}
+.hstat .bignum{font-family:'Courier New',monospace;font-size:26px;font-weight:700;color:var(--peters);line-height:1}
+.hstat .lbl{font-size:12px;color:var(--dug);margin-top:3px}
+.glog{font-size:13.5px;font-family:'Courier New',monospace;color:var(--ink)}
+.glog div{padding:5px 0;border-bottom:1px dashed var(--line)}
+.back{font-family:'Courier New',monospace;font-size:11px;letter-spacing:.08em;background:none;border:none;
+  color:var(--peters);cursor:pointer;padding:0 0 12px;text-transform:uppercase;font-weight:700}
+footer{max-width:860px;margin:0 auto;padding:0 16px 40px;font-family:'Courier New',monospace;
+  font-size:10.5px;color:var(--dug)}
+</style>
+<style>
+.grid{max-width:860px;margin:26px auto;padding:0 16px;display:grid;gap:16px}
+.div-card{display:block;text-decoration:none;color:var(--ink);border:2px solid var(--ink);border-radius:12px;
+  overflow:hidden;background:#fff;transition:transform .14s,box-shadow .14s}
+.div-card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(35,31,30,.14)}
+.div-card:focus-visible{outline:3px solid var(--peters)}
+.dc-top{padding:16px 20px 12px;display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.dc-top h2{font-size:26px}
+.dc-tag{font-family:'Courier New',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  padding:4px 10px;border-radius:12px;background:var(--peters);color:var(--chalk);font-weight:700;white-space:nowrap}
+.dc-tag.gold{background:#c9a227;color:#3a2f00}
+.dc-body{padding:0 20px 14px;font-size:14.5px;color:var(--dug)}
+.dc-foot{border-top:1.5px solid var(--line);padding:10px 20px;font-family:'Courier New',monospace;
+  font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--peters);font-weight:700}
+.gallery{max-width:860px;margin:8px auto 40px;padding:0 16px}
+.gallery h3{font-family:'Courier New',monospace;font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--dug);margin-bottom:10px}
+.gallery .links{display:flex;flex-wrap:wrap;gap:8px}
+.gallery a{font-family:'Courier New',monospace;font-size:11px;padding:7px 12px;border:1.5px solid var(--ink);
+  border-radius:18px;color:var(--ink);text-decoration:none}
+.gallery a:hover{border-color:var(--peters);color:var(--peters)}
+</style>
+</head>
+<body>
+<div class="scoreboard"><div class="sb-inner">
+  <div class="eyebrow">Peters Township Rec &bull; Peterswood Park &amp; Pleasant Valley</div>
+  <h1>Summer Showdown 2026</h1>
+  <div class="sb-sub">Aug 13&ndash;16 &bull; 21 teams &bull; three divisions &bull; four days of rain that never won &mdash; until it did</div>
+</div></div>
+
+<div class="grid">
+  <a class="div-card" href="8u/">
+    <div class="dc-top"><h2>8U Division</h2><span class="dc-tag gold">&#127942; Champions: Bullskin</span></div>
+    <div class="dc-body">The only division to finish &mdash; and it finished in style: three straight one-run games, capped by Bullskin&rsquo;s 4-3 title win over USC at Pleasant Valley.</div>
+    <div class="dc-foot">Standings &bull; Every game &bull; Team pages &rarr;</div>
+  </a>
+  <a class="div-card" href="10u/">
+    <div class="dc-top"><h2>10U Division</h2><span class="dc-tag">Storm-shortened</span></div>
+    <div class="dc-body">A no-hitter, a 36-strikeout weekend, 38 stolen bases by one team &mdash; and four semifinalists left standing when the rain finally won.</div>
+    <div class="dc-foot">Standings &bull; Stat leaders &bull; Every game &bull; Team pages &rarr;</div>
+  </a>
+  <a class="div-card" href="12u/">
+    <div class="dc-top"><h2>12U Division</h2><span class="dc-tag">Final not completed</span></div>
+    <div class="dc-body">USC never trailed until it didn&rsquo;t matter: up 5-2 on Collier mid-championship when the sky closed the park. Closest call of the weekend.</div>
+    <div class="dc-foot">Standings &bull; Stat leaders &bull; Every game &bull; Team pages &rarr;</div>
+  </a>
+</div>
+
+<div class="gallery">
+  <h3>Printable result cards</h3>
+  <div class="links">
+    <a href="cards/Tournament_Card_8U.png">8U results card</a>
+    <a href="cards/Tournament_Card_10U.png">10U results card</a>
+    <a href="cards/Tournament_Card_12U.png">12U results card</a>
+  </div>
+</div>
+<footer>Peters Township Girls Softball Association &bull; results via Tourney Machine &bull; player stats via GameChanger box scores</footer>
+</body>
+</html>
