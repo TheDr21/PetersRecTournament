@@ -107,6 +107,7 @@ footer{max-width:860px;margin:0 auto;padding:0 16px 40px;font-family:'Courier Ne
   <button class="on" data-v="standings" role="tab" aria-selected="true">Standings</button>
   <button data-v="results" role="tab" aria-selected="false">Results</button>
   <button data-v="teams" role="tab" aria-selected="false">Teams</button>
+  <button data-v="leaders" role="tab" aria-selected="false">Leaders</button>
 </nav>
 
 <main>
@@ -123,6 +124,19 @@ footer{max-width:860px;margin:0 auto;padding:0 16px 40px;font-family:'Courier Ne
 
 <section class="view" id="v-teams">
   <div id="teamwrap"></div>
+</section>
+
+<style>
+.lb td:first-child{width:34px;font-family:'Courier New',monospace}
+.lb-p td:nth-child(2),.lb-t td:nth-child(2){text-align:left;font-weight:700;
+  font-family:Georgia,'Times New Roman',serif;font-size:14.5px;color:var(--ink)}
+.lb-p th:nth-child(3),.lb-p td:nth-child(3){text-align:left}
+.lb-p td:nth-child(3){color:var(--dug);font-size:12px;font-family:'Courier New',monospace;font-weight:400}
+</style>
+<section class="view" id="v-leaders">
+  <div class="lb-controls" id="lbchips"></div>
+  <div id="lbwrap"></div>
+  <p class="lb-note" id="lbnote"></p>
 </section>
 </main>
 <footer>Data: Tourney Machine official results &bull; PTGSA</footer>
@@ -204,6 +218,64 @@ function showTeam(k,jump){
      <div class="glog">${t.log.map(g=>`<div>${g}</div>`).join('')}</div></div></div>`;
   document.querySelector('.back').addEventListener('click',teamGrid);
 }
+/* ---------- LEADERS (batting only — coach-pitch division, no pitching stats) ---------- */
+const TAG={tr:"Trinity",bk:"Bullskin",mu:"Munhall",pt:"Peters Twp",usc:"USC",mo:"Monroeville",mw:"Mt. Washington",cm:"CMGYSA"};
+const LB={
+ avg:{label:"Batting Average",col:"AVG",note:"Minimum 10 at-bats. Ties broken by hits.",
+  rows:[["Elizabeth C","pt",".867",15,13],["Remy K","cm",".846",13,11],["Lillian M","pt",".833",12,10],
+        ["McKenzie C","pt",".833",12,10],["Cassidy D","mu",".824",17,14],["Sydney L","usc",".789",19,15],
+        ["Sienna R","cm",".769",13,10],["Maddie G","bk",".765",17,13],["Ava C","cm",".750",12,9],
+        ["Morgan M","bk",".750",16,12]],
+  head:["AB","H"]},
+ hits:{label:"Hits",col:"H",note:"Ties broken by batting average.",
+  rows:[["Sydney L","usc",15,19,".789"],["Cassidy D","mu",14,17,".824"],["Elizabeth C","pt",13,15,".867"],
+        ["Maddie G","bk",13,17,".765"],["Teagan D","bk",13,18,".722"],["Morgan M","bk",12,16,".750"],
+        ["Emma M","mu",12,17,".706"],["Maci K","bk",12,17,".706"],["Riley H","bk",12,18,".667"],
+        ["Remy K","cm",11,13,".846"]],
+  head:["AB","AVG"]},
+ runs:{label:"Runs Scored",col:"R",note:"All players with 7 or more runs.",
+  rows:[["Teagan D","bk",10,13],["Maddie G","bk",10,13],["Avery K","bk",9,11],["Claire C","mu",9,9],
+        ["Savannah L","mu",9,9],["Scarlett Z","tr",9,9],["Phoenyx L","tr",8,6],["Emma M","mu",7,12],
+        ["Hollie S","usc",7,10]],
+  head:["H"]},
+ rbi:{label:"Runs Batted In",col:"RBI",note:"All players with 8 or more RBI.",
+  rows:[["Cassidy D","mu",15,14],["Claire C","mu",11,9],["McKenzie C","pt",10,10],["Scarlett Z","tr",10,9],
+        ["Maddie G","bk",9,13],["Hallie B","bk",9,10],["Remy K","cm",8,11],["Morgan M","bk",8,12],
+        ["Avery K","bk",8,11],["Millie H","tr",8,7],["Grace P","usc",8,11]],
+  head:["H"]},
+ team:{label:"Team Hitting",col:"AVG",note:"Team totals across every game a club played — game counts differ, so the rate stat is the fair comparison.",
+  rows:[["Peters Township","pt",".705",146,103,48],["Bullskin","bk",".594",197,117,66],
+        ["Munhall","mu",".540",174,94,53],["CMGYSA-Powell","cm",".534",118,63,28],
+        ["Monroeville","mo",".523",130,68,34],["USC","usc",".517",211,109,55],
+        ["Mount Washington","mw",".467",105,49,25],["Trinity","tr",".465",157,73,56]],
+  head:["AB","H","R"],team:true}
+};
+function drawLB(key){
+  const b=LB[key];
+  const heads=(b.team?['#','Team']:['#','Player'])
+    .concat(b.team?[]:['Team']).concat([b.col]).concat(b.head);
+  let html='<table class="lb '+(b.team?'lb-t':'lb-p')+'"><thead><tr>'+heads.map(h=>`<th>${h}</th>`).join('')+'</tr></thead><tbody>';
+  b.rows.forEach((r,i)=>{
+    const rank=(i<3?`<span class="medal">${i+1}</span>`:i+1);
+    const rest=r.slice(2);
+    if(b.team){
+      html+=`<tr><td>${rank}</td><td>${r[0]}</td>`+
+        rest.map((v,j)=>`<td class="${j===0?'lead':''}">${v}</td>`).join('')+'</tr>';
+    }else{
+      html+=`<tr><td>${rank}</td><td>${r[0]}</td><td>${TAG[r[1]]}</td>`+
+        rest.map((v,j)=>`<td class="${j===0?'lead':''}">${v}</td>`).join('')+'</tr>';
+    }
+  });
+  html+='</tbody></table>';
+  document.getElementById('lbwrap').innerHTML=html;
+  document.getElementById('lbnote').textContent=b.note;
+  document.querySelectorAll('#lbchips .chip').forEach(c=>c.classList.toggle('on',c.dataset.k===key));
+}
+document.getElementById('lbchips').innerHTML=Object.entries(LB)
+  .map(([k,v])=>`<button class="chip" data-k="${k}">${v.label}</button>`).join('');
+document.querySelectorAll('#lbchips .chip').forEach(c=>c.addEventListener('click',()=>drawLB(c.dataset.k)));
+drawLB('avg');
+
 teamGrid();
 </script>
 </body>
